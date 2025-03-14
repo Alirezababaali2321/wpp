@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صفحه چت ناشناس</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 50px;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+            width: 300px;
+        }
+
+        input, textarea {
+            padding: 10px;
+            margin: 10px 0;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px;
+            font-size: 16px;
+            color: white;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #adminButton {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .admin-page {
+            display: none;
+            margin-top: 20px;
+            text-align: left;
+            width: 400px;
+            margin: 20px auto;
+        }
+
+        .entry {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background-color: #e9ecef;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="chatContainer">
+        <h2>صفحه چت ناشناس</h2>
+        <input type="text" id="name" placeholder="نام شما" />
+        <input type="text" id="phone" placeholder="شماره تلفن (با 09 شروع شود)باید حتما شماره تلفن درست باشد"/>
+        <input type="text" id="telegramId" placeholder="آیدی روبیکا" />
+        <textarea id="description" placeholder="توضیحات شما" rows="4"></textarea>
+        <button id="submitButton">ارسال</button>
+    </div>
+
+    <button id="adminButton">صفحه مدیریت</button>
+
+    <div class="container admin-page" id="adminPage">
+        <h3>صفحه مدیریت</h3>
+        <h4>ورودی‌های کاربران:</h4>
+        <div id="userEntries"></div>
+        <input type="password" id="adminPassword" placeholder="رمز عبور" />
+        <button id="loginButton">ورود به مدیریت</button>
+        <button id="logoutButton" style="display: none;">خروج</button>
+    </div>
+
+    <script>
+        const userEntries = [];
+
+        document.getElementById("submitButton").addEventListener("click", function() {
+            const name = document.getElementById("name").value;
+            const phone = document.getElementById("phone").value;
+            const telegramId = document.getElementById("telegramId").value;
+            const description = document.getElementById("description").value;
+
+            // اعتبارسنجی شماره تلفن
+            if (!phone.startsWith("09")) {
+                alert("شماره تلفن باید با 09 شروع شود!");
+                return;
+            }
+
+            // ذخیره ورودی کاربر
+            userEntries.push({ name, phone, telegramId, description });
+
+            // پاک کردن فیلدها
+            document.getElementById("name").value = '';
+            document.getElementById("phone").value = '';
+            document.getElementById("telegramId").value = '';
+            document.getElementById("description").value = '';
+
+            alert("توضیحات شما با موفقیت ثبت شد!");
+        });
+
+        document.getElementById("adminButton").addEventListener("click", function() {
+            document.getElementById("chatContainer").style.display = "none";
+            document.getElementById("adminPage").style.display = "block";
+        });
+
+        document.getElementById("loginButton").addEventListener("click", function() {
+            const adminPassword = document.getElementById("adminPassword").value;
+
+            if (adminPassword === "aalireza") {
+                // نمایش ورودی‌های کاربران
+                const userEntriesDiv = document.getElementById("userEntries");
+                userEntriesDiv.innerHTML = ''; // پاک کردن محتوای قبلی
+                userEntries.forEach(entry => {
+                    const entryDiv = document.createElement("div");
+                    entryDiv.className = "entry";
+                    entryDiv.innerHTML = `<strong>نام:</strong> ${entry.name}<br>
+                                         <strong>شماره تلفن:</strong> ${entry.phone}<br>
+                                         <strong>آیدی روبیکا:</strong> ${entry.telegramId}<br>
+                                         <strong>توضیحات:</strong> ${entry.description}`;
+                    userEntriesDiv.appendChild(entryDiv);
+                });
+                document.getElementById("logoutButton").style.display = "block";
+                document.getElementById("loginButton").style.display = "none";
+                document.getElementById("adminPassword").style.display = "none";
+            } else {
+                alert("رمز عبور اشتباه است!");
+            }
+        });
+
+        document.getElementById("logoutButton").addEventListener("click", function() {
+            document.getElementById("adminPage").style.display = "none";
+            document.getElementById("chatContainer").style.display = "block";
+            document.getElementById("adminPassword").value = '';
+            document.getElementById("logoutButton").style.display = "none";
+            document.getElementById("loginButton").style.display = "block";
+            document.getElementById("adminPassword").style.display = "block";
+        });
+    </script>
+
+</body>
+</html>
