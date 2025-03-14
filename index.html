@@ -6,55 +6,78 @@
     <title>صفحه چت ناشناس</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Arial', sans-serif;
+            background-color: #2c2c54; /* رنگ پس‌زمینه مشکی نوک مدادی */
             text-align: center;
-            padding: 50px;
+            padding: 20px;
+            color: #f4f4f4; /* رنگ متن */
         }
 
         .container {
-            background-color: white;
+            background-color: #1a1a2e; /* رنگ پس‌زمینه مشکی */
             padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px; /* گوشه‌های گرد */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
             display: inline-block;
-            width: 300px;
+            width: 90%;
+            max-width: 400px;
         }
 
         input, textarea {
-            padding: 10px;
+            padding: 15px;
             margin: 10px 0;
             width: 100%;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            border: none;
+            border-radius: 8px; /* گوشه‌های گرد */
+            background-color: #4a4a6d; /* رنگ ورودی‌ها */
+            color: white; /* رنگ متن ورودی‌ها */
+            font-size: 16px;
+            transition: background-color 0.3s, border 0.3s;
+        }
+
+        input:focus, textarea:focus {
+            background-color: #6a0572; /* رنگ زنده‌تر در حالت فوکوس */
+            border: 2px solid #f4f4f4; /* رنگ مرز در حالت فوکوس */
+            outline: none; /* حذف حاشیه پیش‌فرض */
         }
 
         button {
-            padding: 10px;
+            padding: 15px;
             font-size: 16px;
             color: white;
-            background-color: #007BFF;
+            background-color: #6a0572; /* رنگ بنفش */
             border: none;
-            border-radius: 5px;
+            border-radius: 8px; /* گوشه‌های گرد */
             cursor: pointer;
             width: 100%;
+            transition: background-color 0.3s, transform 0.3s;
         }
 
         button:hover {
-            background-color: #0056b3;
+            background-color: #5a0462; /* رنگ بنفش تیره‌تر */
+            transform: scale(1.05); /* بزرگ‌تر شدن دکمه در حالت هاور */
         }
 
-        #adminButton {
+        .admin-link {
             position: absolute;
             top: 20px;
             right: 20px;
+            color: white; /* رنگ متن */
+            font-size: 18px; /* اندازه متن */
+            cursor: pointer; /* نشانگر ماوس */
+            transition: color 0.3s;
+        }
+
+        .admin-link:hover {
+            color: #6a0572; /* تغییر رنگ در هاور */
         }
 
         .admin-page {
             display: none;
             margin-top: 20px;
             text-align: left;
-            width: 400px;
+            width: 90%;
+            max-width: 400px;
             margin: 20px auto;
         }
 
@@ -64,6 +87,7 @@
             margin: 10px 0;
             border-radius: 5px;
             background-color: #e9ecef;
+            color: black; /* رنگ متن ورودی‌ها */
         }
     </style>
 </head>
@@ -78,7 +102,7 @@
         <button id="submitButton">ارسال</button>
     </div>
 
-    <button id="adminButton">صفحه مدیریت</button>
+    <div class="admin-link" id="adminButton">صفحه مدیریت</div>
 
     <div class="container admin-page" id="adminPage">
         <h3>صفحه مدیریت</h3>
@@ -90,7 +114,29 @@
     </div>
 
     <script>
-        const userEntries = [];
+        // بارگذاری ورودی‌های قبلی از Local Storage
+        const userEntries = JSON.parse(localStorage.getItem('userEntries')) || [];
+
+        function saveEntries() {
+            localStorage.setItem('userEntries', JSON.stringify(userEntries));
+        }
+
+        function loadEntries() {
+            const userEntriesDiv = document.getElementById("userEntries");
+            userEntriesDiv.innerHTML = ''; // پاک کردن محتوای قبلی
+            userEntries.forEach(entry => {
+                const entryDiv = document.createElement("div");
+                entryDiv.className = "entry";
+                entryDiv.innerHTML = `<strong>نام:</strong> ${entry.name}<br>
+                                     <strong>شماره تلفن:</strong> ${entry.phone}<br>
+                                     <strong>آیدی روبیکا:</strong> ${entry.telegramId}<br>
+                                     <strong>توضیحات:</strong> ${entry.description}`;
+                userEntriesDiv.appendChild(entryDiv);
+            });
+        }
+
+        // بارگذاری ورودی‌ها در بارگذاری صفحه
+        loadEntries();
 
         document.getElementById("submitButton").addEventListener("click", function() {
             const name = document.getElementById("name").value;
@@ -106,6 +152,8 @@
 
             // ذخیره ورودی کاربر
             userEntries.push({ name, phone, telegramId, description });
+            saveEntries(); // ذخیره در Local Storage
+            loadEntries(); // بارگذاری ورودی‌ها
 
             // پاک کردن فیلدها
             document.getElementById("name").value = '';
@@ -119,24 +167,13 @@
         document.getElementById("adminButton").addEventListener("click", function() {
             document.getElementById("chatContainer").style.display = "none";
             document.getElementById("adminPage").style.display = "block";
+            loadEntries(); // بارگذاری ورودی‌ها
         });
 
         document.getElementById("loginButton").addEventListener("click", function() {
             const adminPassword = document.getElementById("adminPassword").value;
 
             if (adminPassword === "aalireza") {
-                // نمایش ورودی‌های کاربران
-                const userEntriesDiv = document.getElementById("userEntries");
-                userEntriesDiv.innerHTML = ''; // پاک کردن محتوای قبلی
-                userEntries.forEach(entry => {
-                    const entryDiv = document.createElement("div");
-                    entryDiv.className = "entry";
-                    entryDiv.innerHTML = `<strong>نام:</strong> ${entry.name}<br>
-                                         <strong>شماره تلفن:</strong> ${entry.phone}<br>
-                                         <strong>آیدی روبیکا:</strong> ${entry.telegramId}<br>
-                                         <strong>توضیحات:</strong> ${entry.description}`;
-                    userEntriesDiv.appendChild(entryDiv);
-                });
                 document.getElementById("logoutButton").style.display = "block";
                 document.getElementById("loginButton").style.display = "none";
                 document.getElementById("adminPassword").style.display = "none";
